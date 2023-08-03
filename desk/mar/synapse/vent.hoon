@@ -1,12 +1,12 @@
 /-  *synapse
-|_  cmd=command
+|_  vnt=vent
 ++  grow
   |%
-  ++  noun  cmd
+  ++  noun  vnt
   --
 ++  grab
   |%
-  ++  noun  command
+  ++  noun  vent
   --
 ++  grad  %noun
 --
