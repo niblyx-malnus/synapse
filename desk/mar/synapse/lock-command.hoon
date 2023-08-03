@@ -1,4 +1,4 @@
-/-  *synapse
+/+  *synapse-json
 |_  cmd=lock-command
 ++  grow
   |%
@@ -7,6 +7,7 @@
 ++  grab
   |%
   ++  noun  lock-command
+  ++  json  lock-command:dejs
   --
 ++  grad  %noun
 --

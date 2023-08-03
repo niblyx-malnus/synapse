@@ -46,18 +46,18 @@
 +$  tag-lock     $-([ship tag-id] ?)
 ::
 +$  locks
-  $:  w=$~([%synapse /default-lock] scry)
-      t=$~([%synapse /default-lock] scry)
+  $:  weight=$~([%synapse /default-lock] scry)
+      tag=$~([%synapse /default-lock] scry)
   ==
 :: map from our peers to
 :: (1) our weighting of them and
 :: (2) their weighting of a subject
 ::
-+$  distribution  (map ship [weight weight])
++$  distribution   (map ship [weight weight])
 :: num: total number of voters
 :: vot: weighted average of votes
 ::
-+$  aggregate     [num=@ud vot=weight]
++$  aggregate      [num=@ud vot=weight]
 ::
 +$  pin-command
   %+  pair  [=ship =pin]
@@ -93,9 +93,28 @@
       [%kick-tag-locked ~]
   ==
 ::
++$  vent-read
+  $%  [%dist-by-subjs =(list subject)]
+      [%dist-by-ships =(list ship)]
+      [%dist-by-tags =(list tag-id)]
+      [%aggr-by-subjs =(list subject)]
+      [%aggr-by-ships =(list ship)]
+      [%aggr-by-tags =(list tag-id)]
+  ==
+::
 +$  vent
   $@  ~
   $%  [%tag-id =tag-id]
       [%pin =pin]
+      [%distributions d=(list [subject distribution])]
+      [%aggregates a=(list [subject aggregate])]
+  ==
+::
++$  peek
+  $%  [%tags =tags]
+      [%clusters =clusters]
+      [%source =source]
+      [%echoes =echoes]
+      [%locks =locks]
   ==
 --

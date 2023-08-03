@@ -1,7 +1,11 @@
 /-  spider, *synapse
-/+  *ventio
+/+  *ventio, synapse
 =>  |%
-    +$  dude  dude:gall
+    +$  state-0  [%0 =tags =clusters =source =echoes =locks]
+    +$  card     card:agent:gall
+    +$  dude     dude:gall
+    +$  gowl     bowl:gall
+    +$  sowl     bowl:spider
     --
 =,  strand=strand:spider
 ^-  thread:spider
@@ -9,18 +13,27 @@
 =/  m  (strand ,vase)
 ^-  form:m
 ::
-=/  req=(unit [ship dude request])  !<((unit [ship dude request]) arg)
+=/  req=(unit [gowl request])  !<((unit [gowl request]) arg)
 ?~  req  (strand-fail %no-arg ~)
-=/  [src=ship dap=dude vid=vent-id =mark =noun]  u.req
+=/  [=gowl vid=vent-id =mark =noun]  u.req
 ;<  =vase         bind:m  (unpage mark noun)
-;<  =bowl:spider  bind:m  get-bowl
-=/  [our=ship now=@da eny=@uvJ]  [our now eny]:bowl
+;<  =sowl  bind:m  get-bowl
 :: only you can command your own %synapse
 ::
-?>  =(src our)
+?>  =(src our):gowl
+:: scry the whole state
+::
+=+  .^  state-0  %gx
+      /(scot %p our.sowl)/[dap.gowl]/(scot %da now.sowl)/state/noun
+    ==
+=*  state  -
+=*  syn    ~(. synapse [gowl state])
 ::
 |^
-?+    mark  (punt [our dap] mark vase) :: poke normally
+?+    mark  (punt [our dap]:gowl mark vase) :: poke normally
+    %synapse-vent-read
+  (pure:m !>((handle-vent-read:syn !<(vent-read vase))))
+  ::
     %synapse-async-create
   =+  !<(cmd=async-create vase)
   ?-    -.cmd
@@ -29,7 +42,7 @@
     :: poke %synapse to create tag with new id
     ::
     =+  synapse-tag-command+!>([tag-id %create [name description]:cmd])
-    ;<  ~              bind:m  (poke [our dap] -)
+    ;<  ~              bind:m  (poke [our dap]:gowl -)
     :: vent the id
     ::
     (pure:m !>(tag-id+tag-id))
@@ -38,27 +51,23 @@
     =/  =pin  (unique-pin ship.cmd)
     :: poke %synapse to create tag with new id
     ::
-    =+  synapse-pin-command+!>([[ship pin] %create-pin weight.cmd])
-    ;<  ~              bind:m  (poke [our dap] -)
+    =+  synapse-pin-command+!>([[ship.cmd pin] %create-pin weight.cmd])
+    ;<  ~              bind:m  (poke [our dap]:gowl -)
     :: vent the id
     ::
     (pure:m !>(pin+pin))
   ==
 ==
-++  sour  (scot %p our)
-++  snow  (scot %da now)
-++  tags    .^((map tag-id tag) %gx /[sour]/synapse/[snow]/tags/noun)
-++  source  .^(^source %gx /[sour]/synapse/[snow]/source/noun)
-::
 ++  unique-pin
   |=  =ship
   ^-  pin
-  =/  [=weights =tagged]  (~(got by source) ship)
+  =/  get  (~(get by source) ship)
   |-
-  =/  =pin  (sham [now eny])
-  ?.  (~(has by weights) pin)
+  =/  =pin  (sham [now eny]:sowl)
+  ?~  get  pin
+  ?.  (~(has by weights.u.get) pin)
     pin
-  $(now +(now))
+  $(now.sowl +(now.sowl))
 ::
 ++  unique-tag-id
   |=  name=@t
@@ -66,9 +75,9 @@
   ++  uniquify
     |=  =term
     ^-  tag-id
-    ?.  (~(has by tags) [our term])
-      [our term]
-    =/  num=@t  (numb (end 4 eny))
+    ?.  (~(has by tags) [our.sowl term])
+      [our.sowl term]
+    =/  num=@t  (numb (end 4 eny.sowl))
     $(term (rap 3 term '-' num ~)) :: add random number to end
   ++  numb :: from numb:enjs:format
     |=  a=@u

@@ -1,4 +1,4 @@
-/-  *synapse
+/+  *synapse-json
 |_  cmd=pin-command
 ++  grow
   |%
@@ -7,6 +7,7 @@
 ++  grab
   |%
   ++  noun  pin-command
+  ++  json  pin-command:dejs
   --
 ++  grad  %noun
 --

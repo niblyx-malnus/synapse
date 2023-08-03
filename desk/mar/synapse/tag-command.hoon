@@ -1,4 +1,4 @@
-/-  *synapse
+/+  *synapse-json
 |_  cmd=tag-command
 ++  grow
   |%
@@ -7,6 +7,7 @@
 ++  grab
   |%
   ++  noun  tag-command
+  ++  json  tag-command:dejs
   --
 ++  grad  %noun
 --

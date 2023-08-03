@@ -1,4 +1,4 @@
-/-  *synapse
+/+  *synapse-json
 |_  cmd=async-create
 ++  grow
   |%
@@ -7,6 +7,7 @@
 ++  grab
   |%
   ++  noun  async-create
+  ++  json  async-create:dejs
   --
 ++  grad  %noun
 --
