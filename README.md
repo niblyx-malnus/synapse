@@ -1,6 +1,6 @@
 # Synapse
 
-a distributed reputation system for the propagation of truthful information
+A distributed reputation system for the propagation of truthful information.
 
 ## Principles
 1. Peers can be considered information channels. The information coming through a given channel can be on a scale of "completely false" to "complete noise" to "completely true", therefore the scale which makes the most sense is `[-1, 1]` where `-1` is completely false, `0` is complete noise, and `1` is completely true.
