@@ -28,7 +28,7 @@ synapse-json
 ::
 ++  on-init
   ^-  (quip card _this)
-  `this
+  `this(tags init-baseline:syn)
 ::
 ++  on-save   !>(state)
 ::
@@ -37,7 +37,7 @@ synapse-json
   ^-  (quip card _this)
   =/  old=state-0  !<(state-0 ole)
   =.  state  old
-  `this
+  `this(tags init-baseline:syn)
 ::
 ++  on-poke
   |=  [=mark =vase]
@@ -59,6 +59,10 @@ synapse-json
     ::
       %synapse-tag-command
     =+  !<(cmd=tag-command vase)
+    :: only non-null tags can be modified
+    :: the null tag is the "general" or "baseline" tag
+    ::
+    ?>  ?=(^ p.cmd)
     :: only you can modify tags created in your name
     ::
     ?>  =(our.bowl host.p.cmd)
@@ -91,6 +95,9 @@ synapse-json
       =/  [=weights =tagged]  (~(gut by source) ship [*weights *tagged])
       ?<  (~(has by weights) pin)
       =.  weights  (~(put by weights) pin weight.q.cmd)
+      :: if no baseline, create baseline tag on this pin
+      ::
+      =?  tagged   !(~(has by tagged) ~)  (~(put by tagged) ~ pin)
       :_  this(source (~(put by source) ship weights tagged))
       :: follow the person you just weighted
       ::
@@ -127,11 +134,17 @@ synapse-json
       this(source (~(put by source) ship weights tagged))
       ::
         %del-tag
+      ?<  ?=(~ tag-id.q.cmd) :: cannot delete baseline tag
       ?>  (~(has by tags) tag-id.q.cmd)
       =/  [=weights =tagged]  (~(got by source) ship)
-      =.  tagged   (~(del by tagged) tag-id.q.cmd)
-      :-  (send-del-tag:syn ship tag-id.q.cmd pin)
-      this(source (~(put by source) ship weights tagged))
+      =.  tagged  (~(del by tagged) tag-id.q.cmd)
+      =.  source  (~(put by source) ship weights tagged)
+      :: delete an empty pin
+      ::
+      =^  cards  this
+        ?:  (~(has in (sy ~(val by tagged))) pin)  [~ this]
+        (on-poke synapse-pin-command+!>([[ship pin] %delete-pin ~]))
+      :_(this (welp cards (send-del-tag:syn ship tag-id.q.cmd pin)))
     ==
   ==
 ::
@@ -199,6 +212,7 @@ synapse-json
         (propagate-to-followers:syn peer p.ballot)
       :: follow new tag-id
       ::
+      ?~  tag-id.p.ballot  ~
       =/  [host=ship name=term]  tag-id.p.ballot
       =/  =path  /tag/(scot %p host)/[name]
       ?:  (~(has by wex.bowl) [path host dap.bowl])  ~

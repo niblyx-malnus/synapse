@@ -6,7 +6,7 @@
 ++  enjs
   =,  enjs:format
   |%
-  ++  tag-id      |=(id=^tag-id (rap 3 (scot %p host.id) '/' name.id ~))
+  ++  tag-id  |=(id=^tag-id ?~(id '/' (rap 3 (scot %p host.id) '/' name.id ~)))
   ::
   ++  tag
     |=  =^tag
@@ -123,23 +123,17 @@
     ^-  [@t json]
     [(scot %p ship) (vote v)]
   ::
-  ++  polls
-    |=  =^polls
-    ^-  json
-    %-  pairs
-    %+  turn  ~(tap by polls)
-    |=  [id=^tag-id p=^poll]
-    ^-  [@t json]
-    [(tag-id id) (poll p)]
-  ::
   ++  echoes
     |=  =^echoes
     ^-  json
-    %-  pairs
+    :-  %a
     %+  turn  ~(tap by echoes)
-    |=  [ship=@p p=^polls]
-    ^-  [@t json]
-    [(scot %p ship) (polls p)]
+    |=  [s=^subject p=^poll]
+    ^-  json
+    %-  pairs
+    :~  [%subject (subject s)]
+        [%poll (poll p)]
+    ==
   ::
   ++  locks
     |=  ^locks
@@ -187,6 +181,12 @@
       %tag-id  s+(tag-id tag-id.vnt)
       %pin     s+(scot %uv pin.vnt)
       ::
+        %tag-and-pin
+      %-  pairs
+      :~  [%tag-id s+(tag-id tag-id.vnt)]
+          [%pin s+(scot %uv pin.vnt)]
+      ==
+      ::
         %distributions
       :-  %a
       %+  turn  d.vnt
@@ -218,9 +218,12 @@
     (rash p.jon (cook ryls (cook royl-cell:^so json-rn)))
   ::
   ++  tag-id
-    ;~  (glue fas)
-      ;~(pfix sig fed:ag)
-      (cook crip (star prn))
+    ;~  pose
+      (cold ~ fas)
+      ;~  (glue fas)
+        ;~(pfix sig fed:ag)
+        (cook crip (star prn))
+      ==
     ==
   ::
   ++  subject  (ot ~[ship+(su fed:ag) tag-id+(su tag-id)])
@@ -231,7 +234,10 @@
     ^-  $-(json ^async-create)
     %-  of
     :~  [%tag (ot ~[name+so description+so])]
+        [%tag-on-pin (ot ~[name+so description+so ship+(su fed:ag) pin+pin])]
         [%pin (ot ~[ship+(su fed:ag) weight+ns])]
+        [%pin-with-tag (ot ~[ship+(su fed:ag) weight+ns tag-id+(su tag-id)])]
+        [%pin-with-new-tag (ot ~[ship+(su fed:ag) weight+ns name+so description+so])]
     ==
   ::
   ++  tag-field

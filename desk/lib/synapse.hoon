@@ -27,6 +27,12 @@
   ?&  (gte:rs .1 weight)
       (lte:rs .-1 weight)
   ==
+::
+++  init-baseline
+  ^+  tags
+  %+  ~(put by tags)  ~
+  :-  'Baseline'
+  'General ability to propagate truthful information.'
 :: returns our direct weighting of a subject, if it exists
 ::
 ++  get-weight
@@ -34,16 +40,19 @@
   ^-  (unit weight)
   %-  mole  |.
   =/  [=weights =tagged]  (~(got by source) ship.subject)
-  =/  =pin                (~(got by tagged) tag-id.subject)
-  (~(got by weights) pin)
+  =/  upin=(unit pin)     (~(get by tagged) tag-id.subject)
+  ?^  upin  (~(got by weights) u.upin)
+  :: if we don't weigh this ship on this tag-id,
+  :: take the "general" or "baseline" weight
+  ::
+  (~(got by weights) (~(got by tagged) ~))
 :: returns a peer's vote on a subject, if it exists
 ::
 ++  get-vote
   |=  [peer=ship =subject]
   ^-  (unit vote)
   %-  mole  |.
-  =/  =polls  (~(got by echoes) ship.subject)
-  =/  =poll   (~(got by polls) tag-id.subject)
+  =/  =poll   (~(got by echoes) subject)
   (~(got by poll) peer)
 :: convert a vote to a weight
 ::
@@ -140,8 +149,7 @@
 ++  weighted-distribution
   |=  =subject
   ^-  distribution
-  ?~  polls=(~(get by echoes) ship.subject)  ~
-  ?~  poll=(~(get by u.polls) tag-id.subject)  ~
+  ?~  poll=(~(get by echoes) subject)  ~
   %-  ~(gas by *distribution)
   %+  murn  ~(tap by u.poll)
   |=  [peer=ship =vote]
@@ -188,6 +196,7 @@
   %-  zing
   %+  turn  ~(tap in ~(key by tags))
   |=  =tag-id
+  ?>  ?=(^ tag-id)
   %+  murn  ~(val by sup.bowl)
   |=  [=ship =path]
   ^-  (unit card)
@@ -217,11 +226,7 @@
   ^-  (list card)
   %-  zing
   %+  turn  ~(tap by echoes)
-  |=  [=ship =polls]
-  ^-  (list card)
-  %-  zing
-  %+  turn  ~(tap by polls)
-  |=  [=tag-id =poll]
+  |=  [[=ship =tag-id] =poll]
   ^-  (list card)
   %+  murn  ~(tap by poll)
   |=  [peer=^ship =vote]
@@ -247,8 +252,7 @@
   |=  [peer=ship =ballot]
   ^+  echoes
   =/  [=ship =tag-id]  p.ballot
-  =/  =polls  (~(gut by echoes) ship *polls)
-  =/  =poll   (~(gut by polls) tag-id *poll)
+  =/  =poll  (~(gut by echoes) p.ballot *poll)
   ?-    -.q.ballot
       %emit
     =/  =vote  (fall (get-vote peer p.ballot) *vote)
@@ -258,16 +262,14 @@
     =.  poll
       ?:  =([~ ~] vote)  (~(del by poll) peer)
       (~(put by poll) peer vote)
-    =.  polls  (~(put by polls) tag-id poll)
-    (~(put by echoes) ship polls)
+    (~(put by echoes) p.ballot poll)
     ::
       %pass
     =/  =vote  (apply-pass-ballot peer ballot)
     =.  poll
       ?:  =([~ ~] vote)  (~(del by poll) peer)
       (~(put by poll) peer vote)
-    =.  polls  (~(put by polls) tag-id poll)
-    (~(put by echoes) ship polls)
+    (~(put by echoes) p.ballot poll)
   ==
 ::
 ++  clusters-update
@@ -309,18 +311,14 @@
   ^-  (list card)
   %-  zing
   %+  turn  ~(tap by echoes)
-  |=  [=ship =polls]
-  ^-  (list card)
-  %-  zing
-  %+  turn  ~(tap by polls)
-  |=  [=tag-id =poll]
+  |=  [=subject =poll]
   ^-  (list card)
   %-  zing
   %+  turn  ~(tap by poll)
-  |=  [peer=^ship vote]
+  |=  [peer=ship vote]
   ^-  (list card)
   ?.  =(peer ^peer)  ~
-  (propagate-to-followers peer ship tag-id)
+  (propagate-to-followers peer subject)
 ::
 ++  emit-ballots
   |=  [=subject payload=(unit [weight pin])]
@@ -383,6 +381,7 @@
 ::
 ++  drop
   |=  =tag-id
+  ?>  ?=(^ tag-id)
   |=  upd=tag-update
   ^+  core
   =/  =tag  (~(got by tags) tag-id)

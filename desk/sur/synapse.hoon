@@ -1,11 +1,10 @@
 |%
-+$  pin      @uv
-+$  weight   @rs
-+$  weights  (map pin weight)
-+$  tag-id   [host=ship name=term]
-+$  tagged   (map tag-id pin)
++$  pin       @uv
++$  weight    @rs
+:: the null tag-id is a place for the "general" or "baseline" weight
 ::
-+$  tag  [name=@t description=@t]
++$  tag-id    $@(~ [host=ship name=term])
++$  tag       [name=@t description=@t]
 :: a place to store short descriptions of tags
 ::
 +$  tags      (map tag-id tag)
@@ -14,30 +13,35 @@
 +$  pins      (map [peer=ship subj=ship] pin)
 +$  clusters  (map tag-id pins)
 ::
++$  weights   (map pin weight)
++$  tagged    (map tag-id pin)
 +$  source    (map ship [=weights =tagged])
 ::
 +$  subject   [=ship =tag-id]
+::
++$  duct      (list ship)
++$  haul      (list weight)
++$  pin-list  (list pin)
+++  duct-cap  4
+:: TODO: change ballot to: (pair subject (each [=duct =haul =pin-list] duct))
 ::
 +$  ballot
   %+  pair  subject
   $%  [%emit p=(unit [=weight =pin])]
       [%pass p=(each [=ship =weight] ship)]
   ==
+:: TODO: change vote to (map duct [=haul =time])
+:: direct vote is simply at /[subject-ship]
 ::
 +$  vote
   $:  emit=(unit [=weight =time])
       pass=(map ship [=weight =time]) :: secondhand votes
   ==
+:: secondhand polls for ships around the network
 :: map from your peers to their votes on a ship/tag-id pair
 ::
 +$  poll      (map ship vote)
-:: a poll for each category
-::
-+$  polls     (map tag-id poll)
-:: TODO: refactor as a mip (low priority)
-:: secondhand polls for ships around the network
-::
-+$  echoes    (map ship polls)
++$  echoes    (map subject poll)
 ::
 +$  scry      [=dude:gall =path]
 :: %& means ALLOWED, %| means BANNED
@@ -84,7 +88,10 @@
 ::
 +$  async-create
   $%  [%tag name=@t description=@t]
+      [%tag-on-pin name=@t description=@t =ship =pin]
       [%pin =ship =weight]
+      [%pin-with-tag =ship =weight =tag-id]
+      [%pin-with-new-tag =ship =weight name=@t description=@t]
   ==
 ::
 +$  lock-command
@@ -106,6 +113,7 @@
   $@  ~
   $%  [%tag-id =tag-id]
       [%pin =pin]
+      [%tag-and-pin =tag-id =pin]
       [%distributions d=(list [subject distribution])]
       [%aggregates a=(list [subject aggregate])]
   ==
